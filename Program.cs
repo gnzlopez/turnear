@@ -41,6 +41,13 @@ using (var scope = app.Services.CreateScope())
     await IdentitySeeder.SeedAdminAsync(userManager, app.Configuration);
 }
 
+var pathBase = app.Configuration["PathBase"];
+
+if (!string.IsNullOrWhiteSpace(pathBase))
+{
+    app.UsePathBase(pathBase);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
