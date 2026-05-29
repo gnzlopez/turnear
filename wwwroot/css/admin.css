@@ -1,0 +1,99 @@
+﻿body {
+    background-color: #f8fafc;
+}
+
+.admin-sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background-color: #111827;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.admin-brand {
+    color: #ffffff;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+    .admin-brand:hover {
+        color: #ffffff;
+    }
+
+.admin-nav-link {
+    color: #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.65rem 0.85rem;
+    text-decoration: none;
+    display: block;
+}
+
+    .admin-nav-link:hover {
+        color: #ffffff;
+        background-color: #1f2937;
+    }
+
+    .admin-nav-link.active {
+        color: #ffffff;
+        background-color: #2563eb;
+    }
+
+.admin-content {
+    min-width: 0;
+    min-height: 100vh;
+}
+
+.admin-topbar {
+    background-color: #ffffff;
+}
+
+.admin-mobile-navbar {
+    background-color: #111827;
+}
+
+    .admin-mobile-navbar .navbar-brand {
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+        .admin-mobile-navbar .navbar-brand:hover {
+            color: #ffffff;
+        }
+
+.admin-offcanvas {
+    background-color: #111827;
+    color: #ffffff;
+}
+
+.admin-main {
+    padding: 1.5rem;
+}
+
+@media (max-width: 575.98px) {
+    .admin-main {
+        padding: 1rem;
+    }
+
+    .admin-mobile-navbar .navbar-brand {
+        font-size: 1rem;
+    }
+}
+
+.dashboard-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 1rem;
+    background-color: #ffffff;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
+}
+
+.dashboard-card-label {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.dashboard-card-value {
+    color: #111827;
+    font-size: 2rem;
+    font-weight: 700;
+}

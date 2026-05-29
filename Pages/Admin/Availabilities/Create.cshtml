@@ -1,0 +1,122 @@
+@page "/admin/availability/create"
+@model AppointmentManager.Pages.Admin.Availabilities.CreateModel
+
+@{
+    ViewData["Title"] = "Crear disponibilidad";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-1">Crear disponibilidad</h1>
+            <p class="text-muted mb-0">
+                Cargá un rango horario en el que el profesional atiende habitualmente.
+            </p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="ProfessionalAvailability.ProfessionalId" class="form-label">
+                            Profesional
+                        </label>
+
+                        <select asp-for="ProfessionalAvailability.ProfessionalId"
+                                asp-items="Model.ProfessionalSelect"
+                                class="form-select">
+                            <option value="">Seleccionar profesional</option>
+                        </select>
+
+                        <span asp-validation-for="ProfessionalAvailability.ProfessionalId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="ProfessionalAvailability.DayOfWeek" class="form-label">
+                            Día de la semana
+                        </label>
+
+                        <select asp-for="ProfessionalAvailability.DayOfWeek"
+                                asp-items="Model.DayOfWeekSelect"
+                                class="form-select">
+                            <option value="">Seleccionar día</option>
+                        </select>
+
+                        <span asp-validation-for="ProfessionalAvailability.DayOfWeek" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="ProfessionalAvailability.StartTime" class="form-label">
+                            Hora inicio
+                        </label>
+
+                        <input asp-for="ProfessionalAvailability.StartTime"
+                               type="time"
+                               class="form-control" />
+
+                        <span asp-validation-for="ProfessionalAvailability.StartTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="ProfessionalAvailability.EndTime" class="form-label">
+                            Hora fin
+                        </label>
+
+                        <input asp-for="ProfessionalAvailability.EndTime"
+                               type="time"
+                               class="form-control" />
+
+                        <span asp-validation-for="ProfessionalAvailability.EndTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="ProfessionalAvailability.SlotDurationMinutes" class="form-label">
+                            Duración del turno
+                        </label>
+
+                        <div class="input-group">
+                            <input asp-for="ProfessionalAvailability.SlotDurationMinutes"
+                                   type="number"
+                                   min="5"
+                                   step="5"
+                                   class="form-control" />
+
+                            <span class="input-group-text">min</span>
+                        </div>
+
+                        <span asp-validation-for="ProfessionalAvailability.SlotDurationMinutes" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check mt-2">
+                            <input asp-for="ProfessionalAvailability.IsActive"
+                                   class="form-check-input" />
+
+                            <label asp-for="ProfessionalAvailability.IsActive" class="form-check-label">
+                                Disponibilidad activa
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-page="./Index" class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,87 @@
+@page "/admin/patients/edit/{id:int}"
+@model AppointmentManager.Pages.Admin.Patients.EditModel
+
+@{
+    ViewData["Title"] = "Editar paciente";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-1">Editar paciente</h1>
+            <p class="text-muted mb-0">
+                Modificá los datos básicos del paciente.
+            </p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <input type="hidden" asp-for="Patient.Id" />
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="Patient.FirstName" class="form-label">
+                            Nombre
+                        </label>
+
+                        <input asp-for="Patient.FirstName"
+                               class="form-control" />
+
+                        <span asp-validation-for="Patient.FirstName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Patient.LastName" class="form-label">
+                            Apellido
+                        </label>
+
+                        <input asp-for="Patient.LastName"
+                               class="form-control" />
+
+                        <span asp-validation-for="Patient.LastName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Patient.Email" class="form-label">
+                            Email
+                        </label>
+
+                        <input asp-for="Patient.Email"
+                               class="form-control" />
+
+                        <span asp-validation-for="Patient.Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Patient.Phone" class="form-label">
+                            Teléfono
+                        </label>
+
+                        <input asp-for="Patient.Phone"
+                               class="form-control" />
+
+                        <span asp-validation-for="Patient.Phone" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-page="./Index" class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

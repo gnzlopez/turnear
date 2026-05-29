@@ -1,0 +1,85 @@
+@page "/admin/appointments/delete/{id:int}"
+@model AppointmentManager.Pages.Admin.Appointments.DeleteModel
+
+@{
+    ViewData["Title"] = "Cancelar turno";
+    var appointment = Model.Appointment;
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-1">Cancelar turno</h1>
+            <p class="text-muted mb-0">
+                Revisá la información antes de cancelar este turno.
+            </p>
+        </div>
+    </div>
+
+    <div class="alert alert-warning">
+        ¿Seguro que querés cancelar este turno? Esta acción quitará el registro del sistema.
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Fecha</dt>
+                <dd class="col-sm-9">
+                    @appointment.StartAt.ToString("dd/MM/yyyy")
+                </dd>
+
+                <dt class="col-sm-3">Horario</dt>
+                <dd class="col-sm-9">
+                    @appointment.StartAt.ToString("HH:mm") - @appointment.EndAt.ToString("HH:mm")
+                    <span class="text-muted small">
+                        (@appointment.DurationMinutes min)
+                    </span>
+                </dd>
+
+                <dt class="col-sm-3">Paciente</dt>
+                <dd class="col-sm-9">
+                    @(appointment.Patient is null ? "-" : $"{appointment.Patient.LastName}, {appointment.Patient.FirstName}")
+                </dd>
+
+                <dt class="col-sm-3">Profesional</dt>
+                <dd class="col-sm-9">
+                    @(appointment.Professional is null ? "-" : $"{appointment.Professional.LastName}, {appointment.Professional.FirstName}")
+                </dd>
+
+                <dt class="col-sm-3">Especialidad</dt>
+                <dd class="col-sm-9">
+                    @(appointment.Specialty?.Name ?? appointment.Professional?.Specialty?.Name ?? "-")
+                </dd>
+
+                <dt class="col-sm-3">Estado</dt>
+                <dd class="col-sm-9">
+                    @(appointment.Status?.Name ?? "Sin estado")
+                </dd>
+
+                <dt class="col-sm-3">Notas</dt>
+                <dd class="col-sm-9">
+                    @if (string.IsNullOrWhiteSpace(appointment.Notes))
+                    {
+                        <span class="text-muted">Sin notas</span>
+                    }
+                    else
+                    {
+                        @appointment.Notes
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <form method="post" class="d-flex justify-content-end gap-2 mt-4">
+        <input type="hidden" asp-for="Appointment.Id" />
+
+        <a asp-page="./Index" class="btn btn-outline-secondary">
+            Volver
+        </a>
+
+        <button type="submit" class="btn btn-danger">
+            Cancelar Turno
+        </button>
+    </form>
+</div>

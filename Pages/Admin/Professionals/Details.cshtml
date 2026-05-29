@@ -1,0 +1,107 @@
+@page "/admin/professionals/details/{id:int}"
+@model AppointmentManager.Pages.Admin.Professionals.DetailsModel
+
+@{
+    ViewData["Title"] = "Detalle del profesional";
+    var professional = Model.Professional;
+}
+
+<div class="container-fluid">
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="h3 mb-1">Detalle del profesional</h1>
+            <p class="text-muted mb-0">
+                Información registrada del profesional.
+            </p>
+        </div>
+
+        <div class="col-auto">
+            <a asp-page="./Edit"
+               asp-route-id="@professional.Id"
+               class="btn btn-primary">
+                Editar
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Nombre</dt>
+                <dd class="col-sm-9">
+                    @professional.FirstName
+                </dd>
+
+                <dt class="col-sm-3">Apellido</dt>
+                <dd class="col-sm-9">
+                    @professional.LastName
+                </dd>
+
+                <dt class="col-sm-3">Nombre completo</dt>
+                <dd class="col-sm-9">
+                    @professional.FullName
+                </dd>
+
+                <dt class="col-sm-3">Especialidad</dt>
+                <dd class="col-sm-9">
+                    @if (professional.Specialty is null)
+                    {
+                        <span class="text-muted">Sin especialidad</span>
+                    }
+                    else
+                    {
+                        @professional.Specialty.Name
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">
+                    @if (string.IsNullOrWhiteSpace(professional.Email))
+                    {
+                        <span class="text-muted">Sin email</span>
+                    }
+                    else
+                    {
+                        @professional.Email
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Teléfono</dt>
+                <dd class="col-sm-9">
+                    @if (string.IsNullOrWhiteSpace(professional.Phone))
+                    {
+                        <span class="text-muted">Sin teléfono</span>
+                    }
+                    else
+                    {
+                        @professional.Phone
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Estado</dt>
+                <dd class="col-sm-9">
+                    @if (professional.IsActive)
+                    {
+                        <span class="badge text-bg-success">Activo</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-secondary">Inactivo</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <a asp-page="./Index" class="btn btn-outline-secondary">
+            Volver
+        </a>
+
+        <a asp-page="./Delete"
+           asp-route-id="@professional.Id"
+           class="btn btn-outline-danger">
+            Eliminar
+        </a>
+    </div>
+</div>

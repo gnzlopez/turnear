@@ -1,0 +1,107 @@
+﻿@page "/profesionales"
+@model AppointmentManager.Pages.Public.Professionals.IndexModel
+
+@{
+    ViewData["Title"] = "Profesionales";
+}
+
+<section class="public-section">
+    <div class="container">
+        <div class="row mb-4 align-items-center">
+            <div class="col-lg-8">
+                <h1 class="h2 fw-bold mb-2">Profesionales</h1>
+                <p class="text-muted mb-0">
+                    Conocé los profesionales disponibles y solicitá un turno online.
+                </p>
+            </div>
+        </div>
+
+        <div class="public-card p-4 mb-4">
+            <form method="get">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-8">
+                        <label asp-for="SpecialtyId" class="form-label">
+                            Filtrar por especialidad
+                        </label>
+
+                        <select asp-for="SpecialtyId" class="form-select">
+                            <option value="">Todas las especialidades</option>
+
+                            @foreach (var specialty in Model.Specialties)
+                            {
+                                <option value="@specialty.Id">
+                                    @specialty.Name
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-fill">
+                                Filtrar
+                            </button>
+
+                            <a href="/profesionales" class="btn btn-outline-secondary flex-fill">
+                                Limpiar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        @if (!Model.Professionals.Any())
+        {
+            <div class="alert alert-info">
+                No hay profesionales disponibles para mostrar.
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var professional in Model.Professionals)
+                {
+                    <div class="col-md-6 col-xl-4">
+                        <div class="public-card p-4 h-100 d-flex flex-column">
+                            <div class="mb-3">
+                                <h2 class="h5 mb-1">
+                                    @professional.FullName
+                                </h2>
+
+                                <p class="text-muted mb-0">
+                                    @(professional.SpecialtyName ?? "Sin especialidad")
+                                </p>
+                            </div>
+
+                            <div class="mb-4">
+                                @if (!string.IsNullOrWhiteSpace(professional.Email))
+                                {
+                                    <p class="mb-1 small">
+                                        <span class="text-muted">Email:</span>
+                                        @professional.Email
+                                    </p>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(professional.Phone))
+                                {
+                                    <p class="mb-1 small">
+                                        <span class="text-muted">Teléfono:</span>
+                                        @professional.Phone
+                                    </p>
+                                }
+                            </div>
+
+                            <div class="mt-auto">
+                                <a href="/reservar-turno?professionalId=@professional.Id"
+                                   class="btn btn-primary w-100">
+                                    Reservar turno
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>

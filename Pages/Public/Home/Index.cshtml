@@ -1,0 +1,59 @@
+﻿@page "/"
+@model AppointmentManager.Pages.Public.Home.IndexModel
+
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<section class="public-hero">
+    <div class="container">
+        <div class="row align-items-center justify-content-center gy-4">
+            <div class="col-lg-8 text-center">
+
+                <div class="public-logo-container mb-4">
+                    <img src="~/images/institution-logo.png"
+                         asp-append-version="true"
+                         alt="Logo de la institución"
+                         class="public-institution-logo" />
+                </div>
+
+                <h1 class="public-hero-title mb-3">
+                    Reservá turnos de forma simple
+                </h1>
+
+                <p class="public-hero-text mb-4">
+                    Elegí un profesional, consultá los horarios disponibles y solicitá tu turno online.
+                </p>
+
+                <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                    <a class="btn btn-primary btn-lg px-4" asp-page="/Public/Booking/Index">
+                        Reservar turno
+                    </a>
+
+                    <a class="btn btn-outline-secondary btn-lg px-4" asp-page="/Public/Professionals/Index">
+                        Ver profesionales
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="public-section pt-0">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="public-card p-4">
+                    <h2 class="h4 mb-3 text-center">¿Cómo funciona?</h2>
+
+                    <ol class="mb-0">
+                        <li class="mb-2">Elegís una especialidad o profesional.</li>
+                        <li class="mb-2">Seleccionás un horario disponible.</li>
+                        <li class="mb-2">Completás tus datos.</li>
+                        <li>Recibís la confirmación del turno.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

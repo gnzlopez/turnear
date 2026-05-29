@@ -1,0 +1,105 @@
+@page "/admin/specialties"
+@model AppointmentManager.Pages.Admin.Specialties.IndexModel
+
+@{
+    ViewData["Title"] = "Especialidades";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="h3 mb-1">Especialidades</h1>
+            <p class="text-muted mb-0">
+                Administrá las especialidades disponibles para profesionales y turnos.
+            </p>
+        </div>
+
+        <div class="col-auto">
+            <a asp-page="./Create" class="btn btn-primary">
+                Crear especialidad
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            @if (!Model.Specialties.Any())
+            {
+                <div class="alert alert-info mb-0">
+                    Todavía no hay especialidades cargadas.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Specialties)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="fw-semibold">
+                                            @item.Name
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @if (string.IsNullOrWhiteSpace(item.Description))
+                                        {
+                                            <span class="text-muted">Sin descripción</span>
+                                        }
+                                        else
+                                        {
+                                            @item.Description
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (item.IsActive)
+                                        {
+                                            <span class="badge text-bg-success">Activa</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge text-bg-secondary">Inactiva</span>
+                                        }
+                                    </td>
+
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a asp-page="./Details"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-outline-secondary">
+                                                Ver
+                                            </a>
+
+                                            <a asp-page="./Edit"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-outline-primary">
+                                                Editar
+                                            </a>
+
+                                            <a asp-page="./Delete"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-outline-danger">
+                                                Eliminar
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

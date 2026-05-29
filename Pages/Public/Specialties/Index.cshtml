@@ -1,0 +1,79 @@
+﻿@page "/especialidades"
+@model AppointmentManager.Pages.Public.Specialties.IndexModel
+
+@{
+    ViewData["Title"] = "Especialidades";
+}
+
+<section class="public-section">
+    <div class="container">
+        <div class="row mb-4 align-items-center">
+            <div class="col-lg-8">
+                <h1 class="h2 fw-bold mb-2">Especialidades</h1>
+                <p class="text-muted mb-0">
+                    Conocé las especialidades disponibles y encontrá profesionales para solicitar un turno.
+                </p>
+            </div>
+        </div>
+
+        @if (!Model.Specialties.Any())
+        {
+            <div class="alert alert-info">
+                No hay especialidades disponibles para mostrar.
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                @foreach (var specialty in Model.Specialties)
+                {
+                    <div class="col-md-6 col-xl-4">
+                        <div class="public-card p-4 h-100 d-flex flex-column">
+                            <div class="mb-3">
+                                <h2 class="h5 mb-2">
+                                    @specialty.Name
+                                </h2>
+
+                                @if (string.IsNullOrWhiteSpace(specialty.Description))
+                                {
+                                    <p class="text-muted mb-0">
+                                        Especialidad disponible para solicitar turnos.
+                                    </p>
+                                }
+                                else
+                                {
+                                    <p class="text-muted mb-0">
+                                        @specialty.Description
+                                    </p>
+                                }
+                            </div>
+
+                            <div class="mb-4">
+                                @if (specialty.ActiveProfessionalsCount == 1)
+                                {
+                                    <span class="badge text-bg-light">
+                                        1 profesional disponible
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge text-bg-light">
+                                        @specialty.ActiveProfessionalsCount profesionales disponibles
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="mt-auto">
+                                <a asp-page="/Public/Professionals/Index"
+                                   asp-route-SpecialtyId="@specialty.Id"
+                                   class="btn btn-primary w-100">
+                                    Ver profesionales
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>

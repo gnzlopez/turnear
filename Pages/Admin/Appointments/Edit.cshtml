@@ -1,0 +1,108 @@
+@page "/admin/appointments/edit/{id:int}"
+@model AppointmentManager.Pages.Admin.Appointments.EditModel
+
+@{
+    ViewData["Title"] = "Editar turno";
+    var appointment = Model.AppointmentDetails;
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-1">Editar turno</h1>
+            <p class="text-muted mb-0">
+                Modificá el estado y las notas internas del turno.
+            </p>
+        </div>
+    </div>
+
+    @if (appointment is not null)
+    {
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Información del turno</h2>
+
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">Fecha</dt>
+                    <dd class="col-sm-9">@appointment.StartAt.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-3">Horario</dt>
+                    <dd class="col-sm-9">
+                        @appointment.StartAt.ToString("HH:mm") - @appointment.EndAt.ToString("HH:mm")
+                        <span class="text-muted small">
+                            (@appointment.DurationMinutes min)
+                        </span>
+                    </dd>
+
+                    <dt class="col-sm-3">Paciente</dt>
+                    <dd class="col-sm-9">
+                        @(appointment.Patient is null ? "-" : $"{appointment.Patient.LastName}, {appointment.Patient.FirstName}")
+                    </dd>
+
+                    <dt class="col-sm-3">Profesional</dt>
+                    <dd class="col-sm-9">
+                        @(appointment.Professional is null ? "-" : $"{appointment.Professional.LastName}, {appointment.Professional.FirstName}")
+                    </dd>
+
+                    <dt class="col-sm-3">Especialidad</dt>
+                    <dd class="col-sm-9">
+                        @(appointment.Specialty?.Name ?? appointment.Professional?.Specialty?.Name ?? "-")
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <input type="hidden" asp-for="Input.Id" />
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="Input.StatusId" class="form-label">
+                            Estado
+                        </label>
+
+                        <select asp-for="Input.StatusId"
+                                asp-items="Model.StatusSelect"
+                                class="form-select">
+                            <option value="">Seleccionar estado</option>
+                        </select>
+
+                        <span asp-validation-for="Input.StatusId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Input.Notes" class="form-label">
+                            Notas
+                        </label>
+
+                        <textarea asp-for="Input.Notes"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Notas internas opcionales"></textarea>
+
+                        <span asp-validation-for="Input.Notes" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-page="./Index" class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

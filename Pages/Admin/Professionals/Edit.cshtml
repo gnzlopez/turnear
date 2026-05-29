@@ -1,0 +1,114 @@
+@page "/admin/professionals/edit/{id:int}"
+@model AppointmentManager.Pages.Admin.Professionals.EditModel
+
+@{
+    ViewData["Title"] = "Editar profesional";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-1">Editar profesional</h1>
+            <p class="text-muted mb-0">
+                Modificá los datos básicos del profesional.
+            </p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <input type="hidden" asp-for="Professional.Id" />
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="Professional.FirstName" class="form-label">
+                            Nombre
+                        </label>
+
+                        <input asp-for="Professional.FirstName"
+                               class="form-control" />
+
+                        <span asp-validation-for="Professional.FirstName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Professional.LastName" class="form-label">
+                            Apellido
+                        </label>
+
+                        <input asp-for="Professional.LastName"
+                               class="form-control" />
+
+                        <span asp-validation-for="Professional.LastName" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Professional.SpecialtyId" class="form-label">
+                            Especialidad
+                        </label>
+
+                        <select asp-for="Professional.SpecialtyId"
+                                asp-items="Model.SpecialtySelect"
+                                class="form-select">
+                            <option value="">Seleccionar especialidad</option>
+                        </select>
+
+                        <span asp-validation-for="Professional.SpecialtyId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Professional.Email" class="form-label">
+                            Email
+                        </label>
+
+                        <input asp-for="Professional.Email"
+                               class="form-control" />
+
+                        <span asp-validation-for="Professional.Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Professional.Phone" class="form-label">
+                            Teléfono
+                        </label>
+
+                        <input asp-for="Professional.Phone"
+                               class="form-control" />
+
+                        <span asp-validation-for="Professional.Phone" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check mt-2">
+                            <input asp-for="Professional.IsActive"
+                                   class="form-check-input" />
+
+                            <label asp-for="Professional.IsActive" class="form-check-label">
+                                Profesional activo
+                            </label>
+                        </div>
+
+                        <span asp-validation-for="Professional.IsActive" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-page="./Index" class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

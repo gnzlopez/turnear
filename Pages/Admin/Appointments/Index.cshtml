@@ -1,0 +1,165 @@
+@page "/admin/appointments"
+@model AppointmentManager.Pages.Admin.Appointments.IndexModel
+
+@{
+    ViewData["Title"] = "Turnos";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="h3 mb-1">Turnos</h1>
+            <p class="text-muted mb-0">
+                Administrá los turnos creados para pacientes y profesionales.
+            </p>
+        </div>
+
+        <div class="col-auto">
+            <a asp-page="./Create" class="btn btn-primary">
+                Crear turno
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            @if (!Model.Appointments.Any())
+            {
+                <div class="alert alert-info mb-0">
+                    Todavía no hay turnos cargados.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Horario</th>
+                                <th>Paciente</th>
+                                <th>Profesional</th>
+                                <th>Especialidad</th>
+                                <th>Estado</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Appointments)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="fw-semibold">
+                                            @item.StartAt.ToString("dd/MM/yyyy")
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @item.StartAt.ToString("HH:mm") - @item.EndAt.ToString("HH:mm")
+                                        <span class="text-muted small">
+                                            (@item.DurationMinutes min)
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @GetPatientName(item)
+                                    </td>
+
+                                    <td>
+                                        @GetProfessionalName(item)
+                                    </td>
+
+                                    <td>
+                                        @GetSpecialtyName(item)
+                                    </td>
+
+                                    <td>
+                                        <span class="badge @GetStatusBadgeClass(item.Status?.Name)">
+                                            @(item.Status?.Name ?? "Sin estado")
+                                        </span>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a asp-page="./Details"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-outline-secondary">
+                                                Ver
+                                            </a>
+
+                                            <a asp-page="./Edit"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-outline-primary">
+                                                Editar
+                                            </a>
+
+                                            <a asp-page="./Delete"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-outline-danger">
+                                                Cancelar
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    private static string GetPatientName(AppointmentManager.Models.Appointment appointment)
+    {
+        if (appointment.Patient is null)
+        {
+            return "-";
+        }
+
+        return $"{appointment.Patient.LastName}, {appointment.Patient.FirstName}";
+    }
+
+    private static string GetProfessionalName(AppointmentManager.Models.Appointment appointment)
+    {
+        if (appointment.Professional is null)
+        {
+            return "-";
+        }
+
+        return $"{appointment.Professional.LastName}, {appointment.Professional.FirstName}";
+    }
+
+    private static string GetSpecialtyName(AppointmentManager.Models.Appointment appointment)
+    {
+        return appointment.Specialty?.Name
+            ?? appointment.Professional?.Specialty?.Name
+            ?? "-";
+    }
+
+    private static string GetStatusBadgeClass(string? statusName)
+    {
+        return statusName?.ToLowerInvariant() switch
+        {
+            "pending" => "text-bg-warning",
+            "pendiente" => "text-bg-warning",
+
+            "confirmed" => "text-bg-success",
+            "confirmado" => "text-bg-success",
+
+            "cancelled" => "text-bg-secondary",
+            "canceled" => "text-bg-secondary",
+            "cancelado" => "text-bg-secondary",
+
+            "rejected" => "text-bg-danger",
+            "rechazado" => "text-bg-danger",
+
+            "noshow" => "text-bg-dark",
+            "no show" => "text-bg-dark",
+            "ausente" => "text-bg-dark",
+
+            _ => "text-bg-light text-dark"
+        };
+    }
+}

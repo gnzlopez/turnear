@@ -1,0 +1,69 @@
+@page "/admin/specialties/delete/{id:int}"
+@model AppointmentManager.Pages.Admin.Specialties.DeleteModel
+
+@{
+    ViewData["Title"] = "Eliminar especialidad";
+    var specialty = Model.Specialty;
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-1">Eliminar especialidad</h1>
+            <p class="text-muted mb-0">
+                Revisá la información antes de eliminar esta especialidad.
+            </p>
+        </div>
+    </div>
+
+    <div class="alert alert-warning">
+        ¿Seguro que querés eliminar esta especialidad? Si tiene profesionales o turnos asociados, puede ser conveniente conservarla o desactivarla en lugar de eliminarla.
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Nombre</dt>
+                <dd class="col-sm-9">
+                    @specialty.Name
+                </dd>
+
+                <dt class="col-sm-3">Descripción</dt>
+                <dd class="col-sm-9">
+                    @if (string.IsNullOrWhiteSpace(specialty.Description))
+                    {
+                        <span class="text-muted">Sin descripción</span>
+                    }
+                    else
+                    {
+                        @specialty.Description
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Estado</dt>
+                <dd class="col-sm-9">
+                    @if (specialty.IsActive)
+                    {
+                        <span class="badge text-bg-success">Activa</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-secondary">Inactiva</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <form method="post" class="d-flex justify-content-end gap-2 mt-4">
+        <input type="hidden" asp-for="Specialty.Id" />
+
+        <a asp-page="./Index" class="btn btn-outline-secondary">
+            Cancelar
+        </a>
+
+        <button type="submit" class="btn btn-danger">
+            Eliminar
+        </button>
+    </form>
+</div>

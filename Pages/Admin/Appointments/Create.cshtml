@@ -1,0 +1,149 @@
+@page "/admin/appointments/create"
+@model AppointmentManager.Pages.Admin.Appointments.CreateModel
+
+@{
+    ViewData["Title"] = "Crear turno";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-1">Crear turno</h1>
+            <p class="text-muted mb-0">
+                Seleccioná un profesional y una fecha para consultar los horarios disponibles.
+            </p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="post" asp-page-handler="SearchSlots">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label asp-for="Input.ProfessionalId" class="form-label">Profesional</label>
+                        <select asp-for="Input.ProfessionalId"
+                                asp-items="Model.ProfessionalSelect"
+                                class="form-select">
+                            <option value="">Seleccionar profesional</option>
+                        </select>
+                        <span asp-validation-for="Input.ProfessionalId" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Input.Date" class="form-label">Fecha</label>
+                        <input asp-for="Input.Date"
+                               type="date"
+                               class="form-control" />
+                        <span asp-validation-for="Input.Date" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary w-100">
+                            Buscar horarios
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.SearchWasPerformed)
+    {
+        <div class="card">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Horarios disponibles</h2>
+
+                @if (!Model.AvailableSlots.Any())
+                {
+                    <div class="alert alert-warning mb-0">
+                        No hay horarios disponibles para el profesional y la fecha seleccionados.
+                    </div>
+                }
+                else
+                {
+                    <form method="post" asp-page-handler="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <input type="hidden" asp-for="Input.ProfessionalId" />
+                        <input type="hidden" asp-for="Input.Date" />
+
+                        <div class="mb-4">
+                            <label class="form-label">Seleccioná un horario</label>
+
+                            <div class="appointment-slots-grid">
+                                @for (var i = 0; i < Model.AvailableSlots.Count; i++)
+                                {
+                                    var slot = Model.AvailableSlots[i];
+                                    var slotValue = $"{slot.StartAt:O}|{slot.EndAt:O}";
+                                    var slotId = $"slot_{i}";
+
+                                    <input type="radio"
+                                           class="btn-check"
+                                           asp-for="Input.SelectedSlotValue"
+                                           id="@slotId"
+                                           value="@slotValue"
+                                           autocomplete="off" />
+
+                                    <label class="btn btn-outline-primary appointment-slot-button" for="@slotId">
+                                        <span class="fw-semibold">@slot.StartAt.ToString("HH:mm")</span>
+                                        <small class="d-block text-muted">
+                                            hasta @slot.EndAt.ToString("HH:mm")
+                                        </small>
+                                    </label>
+                                }
+                            </div>
+
+                            <span asp-validation-for="Input.SelectedSlotValue" class="text-danger"></span>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Input.PatientId" class="form-label">Paciente</label>
+                                <select asp-for="Input.PatientId"
+                                        asp-items="Model.PatientSelect"
+                                        class="form-select">
+                                    <option value="">Seleccionar paciente</option>
+                                </select>
+                                <span asp-validation-for="Input.PatientId" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Input.StatusId" class="form-label">Estado</label>
+                                <select asp-for="Input.StatusId" class="form-select">
+                                    <option value="1">Pendiente</option>
+                                    <option value="2">Confirmado</option>
+                                </select>
+                                <span asp-validation-for="Input.StatusId" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-12">
+                                <label asp-for="Input.Notes" class="form-label">Notas</label>
+                                <textarea asp-for="Input.Notes"
+                                          class="form-control"
+                                          rows="3"
+                                          placeholder="Notas internas opcionales"></textarea>
+                                <span asp-validation-for="Input.Notes" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a asp-page="./Index" class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+
+                            <button type="submit" class="btn btn-primary">
+                                Crear turno
+                            </button>
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

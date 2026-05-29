@@ -1,0 +1,81 @@
+@page "/admin/appointment-statuses"
+@model AppointmentManager.Pages.Admin.AppointmentStatuses.IndexModel
+
+@{
+    ViewData["Title"] = "Estados de turnos";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="h3 mb-1">Estados de turnos</h1>
+            <p class="text-muted mb-0">
+                Administrá los estados disponibles para clasificar los turnos.
+            </p>
+        </div>
+
+        <div class="col-auto">
+            <a asp-page="./Create" class="btn btn-primary">
+                Crear estado
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            @if (!Model.Statuses.Any())
+            {
+                <div class="alert alert-info mb-0">
+                    Todavía no hay estados de turnos cargados.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Statuses)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="fw-semibold">
+                                            @item.Name
+                                        </span>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a asp-page="./Details"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-outline-secondary">
+                                                Ver
+                                            </a>
+
+                                            <a asp-page="./Edit"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-outline-primary">
+                                                Editar
+                                            </a>
+
+                                            <a asp-page="./Delete"
+                                               asp-route-id="@item.Id"
+                                               class="btn btn-outline-danger">
+                                                Eliminar
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

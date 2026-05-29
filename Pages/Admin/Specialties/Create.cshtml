@@ -1,0 +1,79 @@
+@page "/admin/specialties/create"
+@model AppointmentManager.Pages.Admin.Specialties.CreateModel
+
+@{
+    ViewData["Title"] = "Crear especialidad";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-1">Crear especialidad</h1>
+            <p class="text-muted mb-0">
+                Cargá una nueva especialidad para asociarla a profesionales y turnos.
+            </p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="Specialty.Name" class="form-label">
+                            Nombre
+                        </label>
+
+                        <input asp-for="Specialty.Name"
+                               class="form-control"
+                               placeholder="Ej: Kinesiología, Odontología, Nutrición" />
+
+                        <span asp-validation-for="Specialty.Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Specialty.Description" class="form-label">
+                            Descripción
+                        </label>
+
+                        <textarea asp-for="Specialty.Description"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Descripción opcional de la especialidad"></textarea>
+
+                        <span asp-validation-for="Specialty.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check mt-2">
+                            <input asp-for="Specialty.IsActive"
+                                   class="form-check-input" />
+
+                            <label asp-for="Specialty.IsActive" class="form-check-label">
+                                Especialidad activa
+                            </label>
+                        </div>
+
+                        <span asp-validation-for="Specialty.IsActive" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-page="./Index" class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

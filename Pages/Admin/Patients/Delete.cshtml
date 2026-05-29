@@ -1,0 +1,69 @@
+@page "/admin/patients/delete/{id:int}"
+@model AppointmentManager.Pages.Admin.Patients.DeleteModel
+
+@{
+    ViewData["Title"] = "Eliminar paciente";
+    var patient = Model.Patient;
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-1">Eliminar paciente</h1>
+            <p class="text-muted mb-0">
+                Revisá la información antes de eliminar este paciente.
+            </p>
+        </div>
+    </div>
+
+    <div class="alert alert-warning">
+        ¿Seguro que querés eliminar este paciente? Si tiene turnos asociados, puede ser conveniente desactivarlo en lugar de eliminarlo.
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Paciente</dt>
+                <dd class="col-sm-9">
+                    @patient.LastName, @patient.FirstName
+                </dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">
+                    @if (string.IsNullOrWhiteSpace(patient.Email))
+                    {
+                        <span class="text-muted">Sin email</span>
+                    }
+                    else
+                    {
+                        @patient.Email
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Teléfono</dt>
+                <dd class="col-sm-9">
+                    @if (string.IsNullOrWhiteSpace(patient.Phone))
+                    {
+                        <span class="text-muted">Sin teléfono</span>
+                    }
+                    else
+                    {
+                        @patient.Phone
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <form method="post" class="d-flex justify-content-end gap-2 mt-4">
+        <input type="hidden" asp-for="Patient.Id" />
+
+        <a asp-page="./Index" class="btn btn-outline-secondary">
+            Cancelar
+        </a>
+
+        <button type="submit" class="btn btn-danger">
+            Eliminar
+        </button>
+    </form>
+</div>

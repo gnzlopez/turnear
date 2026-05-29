@@ -1,0 +1,45 @@
+﻿@page "/admin/appointment-statuses/delete/{id:int}"
+@model AppointmentManager.Pages.Admin.AppointmentStatuses.DeleteModel
+
+@{
+    ViewData["Title"] = "Eliminar estado de turno";
+    var appointmentStatus = Model.Status;
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-1">Eliminar estado de turno</h1>
+            <p class="text-muted mb-0">
+                Revisá la información antes de eliminar este estado.
+            </p>
+        </div>
+    </div>
+
+    <div class="alert alert-warning">
+        ¿Seguro que querés eliminar este estado? Si existen turnos asociados a este estado, la eliminación puede fallar o afectar la integridad de los datos.
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Nombre</dt>
+                <dd class="col-sm-9">
+                    @appointmentStatus.Name
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <form method="post" class="d-flex justify-content-end gap-2 mt-4">
+        <input type="hidden" asp-for="Status.Id" />
+
+        <a asp-page="./Index" class="btn btn-outline-secondary">
+            Cancelar
+        </a>
+
+        <button type="submit" class="btn btn-danger">
+            Eliminar
+        </button>
+    </form>
+</div>

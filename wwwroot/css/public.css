@@ -1,0 +1,100 @@
+﻿:root {
+    --public-primary: #2563eb;
+    --public-primary-dark: #1d4ed8;
+    --public-text: #1f2937;
+    --public-muted: #6b7280;
+    --public-bg-soft: #f8fafc;
+}
+
+html,
+body {
+    min-height: 100%;
+    background-color: #ffffff;
+}
+
+body {
+    color: var(--public-text);
+    background-color: #ffffff;
+}
+
+main {
+    background-color: #ffffff;
+}
+
+.public-header {
+    background-color: #ffffff;
+}
+
+.navbar-brand {
+    color: var(--public-primary);
+}
+
+    .navbar-brand:hover {
+        color: var(--public-primary-dark);
+    }
+
+.btn-primary {
+    background-color: var(--public-primary);
+    border-color: var(--public-primary);
+}
+
+    .btn-primary:hover {
+        background-color: var(--public-primary-dark);
+        border-color: var(--public-primary-dark);
+    }
+
+.public-hero {
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    padding: 4rem 0 3rem 0;
+}
+
+.public-hero-title {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.public-hero-text {
+    color: var(--public-muted);
+    font-size: 1.15rem;
+}
+
+.public-section {
+    background-color: #ffffff;
+    padding: 3rem 0;
+}
+
+.public-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 1rem;
+    background-color: #ffffff;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
+}
+
+.public-footer {
+    background-color: var(--public-bg-soft);
+}
+
+.public-logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.public-institution-logo {
+    max-width: 180px;
+    max-height: 120px;
+    object-fit: contain;
+}
+
+.booking-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.75rem;
+}
+
+.booking-slot-button {
+    padding: 0.85rem 1rem;
+    text-align: center;
+    border-radius: 0.75rem;
+}

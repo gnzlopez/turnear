@@ -1,0 +1,94 @@
+@page "/admin/availability/delete/{id:int}"
+@model AppointmentManager.Pages.Admin.Availabilities.DeleteModel
+
+@{
+    ViewData["Title"] = "Eliminar disponibilidad";
+    var availability = Model.ProfessionalAvailability;
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="h3 mb-1">Eliminar disponibilidad</h1>
+            <p class="text-muted mb-0">
+                Revisá la información antes de eliminar este rango horario.
+            </p>
+        </div>
+    </div>
+
+    <div class="alert alert-warning">
+        ¿Seguro que querés eliminar esta disponibilidad? Esta acción no eliminará turnos ya creados.
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Profesional</dt>
+                <dd class="col-sm-9">
+                    @availability.Professional.LastName, @availability.Professional.FirstName
+                </dd>
+
+                <dt class="col-sm-3">Especialidad</dt>
+                <dd class="col-sm-9">
+                    @availability.Professional.Specialty.Name
+                </dd>
+
+                <dt class="col-sm-3">Día de la semana</dt>
+                <dd class="col-sm-9">
+                    @GetDayName(availability.DayOfWeek)
+                </dd>
+
+                <dt class="col-sm-3">Horario</dt>
+                <dd class="col-sm-9">
+                    @availability.StartTime.ToString("HH:mm") - @availability.EndTime.ToString("HH:mm")
+                </dd>
+
+                <dt class="col-sm-3">Duración del turno</dt>
+                <dd class="col-sm-9">
+                    @availability.SlotDurationMinutes minutos
+                </dd>
+
+                <dt class="col-sm-3">Estado</dt>
+                <dd class="col-sm-9">
+                    @if (availability.IsActive)
+                    {
+                        <span class="badge text-bg-success">Activa</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-secondary">Inactiva</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <form method="post" class="d-flex justify-content-end gap-2 mt-4">
+        <input type="hidden" asp-for="ProfessionalAvailability.Id" />
+
+        <a asp-page="./Index" class="btn btn-outline-secondary">
+            Cancelar
+        </a>
+
+        <button type="submit" class="btn btn-danger">
+            Eliminar
+        </button>
+    </form>
+</div>
+
+@functions {
+    private static string GetDayName(DayOfWeek dayOfWeek)
+    {
+        return dayOfWeek switch
+        {
+            DayOfWeek.Monday => "Lunes",
+            DayOfWeek.Tuesday => "Martes",
+            DayOfWeek.Wednesday => "Miércoles",
+            DayOfWeek.Thursday => "Jueves",
+            DayOfWeek.Friday => "Viernes",
+            DayOfWeek.Saturday => "Sábado",
+            DayOfWeek.Sunday => "Domingo",
+            _ => dayOfWeek.ToString()
+        };
+    }
+}

@@ -1,0 +1,31 @@
+﻿@page "/reservar-turno/exito"
+
+@{
+    ViewData["Title"] = "Turno solicitado";
+}
+
+<section class="public-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="public-card p-4 text-center">
+                    <h1 class="h3 mb-3">Tu solicitud fue registrada</h1>
+
+                    <p class="text-muted mb-4">
+                        El turno fue solicitado correctamente. La institución podrá revisar y confirmar el turno desde el sistema.
+                    </p>
+
+                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                        <a asp-page="/Public/Home/Index" class="btn btn-primary">
+                            Volver al inicio
+                        </a>
+
+                        <a asp-page="/Public/Professionals/Index" class="btn btn-outline-secondary">
+                            Ver profesionales
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
