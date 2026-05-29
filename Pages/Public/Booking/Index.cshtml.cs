@@ -30,34 +30,64 @@ public class IndexModel : PageModel
 
     public SelectList? ProfessionalSelect { get; set; }
 
+    public List<AvailableDateViewModel> AvailableDates { get; set; } = new();
+
     public List<AvailableSlotViewModel> AvailableSlots { get; set; } = new();
 
-    public bool SearchWasPerformed { get; set; }
+    public bool DatesWereLoaded { get; set; }
+
+    public bool SlotsWereLoaded { get; set; }
 
     public async Task OnGetAsync()
     {
-        Input.Date = DateOnly.FromDateTime(DateTime.Today);
-
         if (PreselectedProfessionalId.HasValue)
         {
             Input.ProfessionalId = PreselectedProfessionalId.Value;
+            DatesWereLoaded = true;
+
+            AvailableDates = await _availabilityService.GetAvailableDatesAsync(
+                Input.ProfessionalId.Value,
+                DateOnly.FromDateTime(DateTime.Today));
         }
 
         await LoadSelectListsAsync();
     }
 
-    public async Task<IActionResult> OnPostSearchSlotsAsync()
+    public async Task<IActionResult> OnPostSearchDatesAsync()
     {
+        RemovePatientAndSlotValidation();
+
         await LoadSelectListsAsync();
 
-        SearchWasPerformed = true;
+        if (Input.ProfessionalId is null)
+        {
+            ModelState.AddModelError("Input.ProfessionalId", "Debe seleccionar un profesional.");
+        }
 
-        ModelState.Remove("Input.SelectedSlotValue");
-        ModelState.Remove("Input.PatientFirstName");
-        ModelState.Remove("Input.PatientLastName");
-        ModelState.Remove("Input.Phone");
-        ModelState.Remove("Input.Email");
-        ModelState.Remove("Input.Notes");
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+
+        DatesWereLoaded = true;
+
+        AvailableDates = await _availabilityService.GetAvailableDatesAsync(
+            Input.ProfessionalId.Value,
+            DateOnly.FromDateTime(DateTime.Today));
+
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostSearchSlotsAsync()
+    {
+        RemovePatientAndSlotValidation();
+
+        await LoadSelectListsAsync();
+
+        DatesWereLoaded = true;
+        SlotsWereLoaded = true;
+
+        await LoadAvailableDatesAsync();
 
         ValidateSearchData();
 
@@ -77,7 +107,10 @@ public class IndexModel : PageModel
     {
         await LoadSelectListsAsync();
 
-        SearchWasPerformed = true;
+        DatesWereLoaded = true;
+        SlotsWereLoaded = true;
+
+        await LoadAvailableDatesAsync();
 
         if (Input.ProfessionalId.HasValue && Input.Date.HasValue)
         {
@@ -137,7 +170,7 @@ public class IndexModel : PageModel
 
         var appointment = new Appointment
         {
-            PatientId = patient.Id,
+            Patient = patient,
             ProfessionalId = professional.Id,
             SpecialtyId = professional.SpecialtyId,
             StatusId = pendingStatusId.Value,
@@ -173,6 +206,19 @@ public class IndexModel : PageModel
         ProfessionalSelect = new SelectList(professionals, "Id", "Name", Input.ProfessionalId);
     }
 
+    private async Task LoadAvailableDatesAsync()
+    {
+        if (Input.ProfessionalId is null)
+        {
+            AvailableDates = new List<AvailableDateViewModel>();
+            return;
+        }
+
+        AvailableDates = await _availabilityService.GetAvailableDatesAsync(
+            Input.ProfessionalId.Value,
+            DateOnly.FromDateTime(DateTime.Today));
+    }
+
     private void ValidateSearchData()
     {
         if (Input.ProfessionalId is null)
@@ -191,6 +237,16 @@ public class IndexModel : PageModel
         }
     }
 
+    private void RemovePatientAndSlotValidation()
+    {
+        ModelState.Remove("Input.SelectedSlotValue");
+        ModelState.Remove("Input.PatientFirstName");
+        ModelState.Remove("Input.PatientLastName");
+        ModelState.Remove("Input.Phone");
+        ModelState.Remove("Input.Email");
+        ModelState.Remove("Input.Notes");
+    }
+
     private async Task<int?> GetPendingStatusIdAsync()
     {
         return await _db.AppointmentStatuses
@@ -206,6 +262,7 @@ public class IndexModel : PageModel
         var firstName = Input.PatientFirstName.Trim();
         var lastName = Input.PatientLastName.Trim();
         var phone = Input.Phone.Trim();
+
         var email = string.IsNullOrWhiteSpace(Input.Email)
             ? null
             : Input.Email.Trim();

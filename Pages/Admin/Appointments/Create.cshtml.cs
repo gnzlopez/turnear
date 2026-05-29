@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using AppointmentManager.Data;
 using AppointmentManager.Models;
 using AppointmentManager.Services.Availability;
@@ -6,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 namespace AppointmentManager.Pages.Admin.Appointments;
 
@@ -15,56 +16,80 @@ public class CreateModel : PageModel
     private readonly ApplicationDbContext _db;
     private readonly IAvailabilityService _availabilityService;
 
-    public CreateModel(ApplicationDbContext db, IAvailabilityService availabilityService)
+    public CreateModel(ApplicationDbContext context, IAvailabilityService availabilityService)
     {
-        _db = db;
+        _db = context;
         _availabilityService = availabilityService;
     }
 
     [BindProperty]
-    public AppointmentCreateViewModel Input { get; set; } = new();
+    public AppointmentCreateInputModel Input { get; set; } = new();
 
     public SelectList? PatientSelect { get; set; }
     public SelectList? ProfessionalSelect { get; set; }
     public SelectList? StatusSelect { get; set; }
 
+    public List<AvailableDateViewModel> AvailableDates { get; set; } = new();
     public List<AvailableSlotViewModel> AvailableSlots { get; set; } = new();
 
-    public bool SearchWasPerformed { get; set; }
+    public bool DatesWereLoaded { get; set; }
+    public bool SlotsWereLoaded { get; set; }
 
     public async Task OnGetAsync()
     {
-        Input.Date = DateOnly.FromDateTime(DateTime.Today);
-        Input.StatusId = 1; // Pending
-
         await LoadSelectListsAsync();
     }
 
-    public async Task<IActionResult> OnPostSearchSlotsAsync()
+    public async Task<IActionResult> OnPostSearchDatesAsync()
     {
         await LoadSelectListsAsync();
 
-        SearchWasPerformed = true;
-
-        // Estos campos son necesarios recién al crear el turno, no al buscar horarios.
-        ModelState.Remove("Input.PatientId");
-        ModelState.Remove("Input.StatusId");
-        ModelState.Remove("Input.SelectedSlotValue");
-        ModelState.Remove("Input.Notes");
+        if (Input.ProfessionalId is null)
+        {
+            ModelState.AddModelError("Input.ProfessionalId", "Debe seleccionar un profesional.");
+        }
 
         if (!ModelState.IsValid)
         {
             return Page();
         }
 
-        if (Input.ProfessionalId is null || Input.Date is null)
+        DatesWereLoaded = true;
+
+        AvailableDates = await _availabilityService.GetAvailableDatesAsync(
+            Input.ProfessionalId.Value,
+            DateOnly.FromDateTime(DateTime.Today));
+
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostSearchSlotsAsync()
+    {
+        await LoadSelectListsAsync();
+
+        DatesWereLoaded = true;
+        SlotsWereLoaded = true;
+
+        await LoadAvailableDatesAsync();
+
+        ValidateProfessionalAndDate();
+
+        if (!ModelState.IsValid)
         {
             return Page();
         }
 
+        var dateIsAvailable = AvailableDates.Any(d => d.Date == Input.Date!.Value);
+
+        if (!dateIsAvailable)
+        {
+            ModelState.AddModelError("Input.Date", "La fecha seleccionada no tiene horarios disponibles.");
+            return Page();
+        }
+
         AvailableSlots = await _availabilityService.GetAvailableSlotsAsync(
-            Input.ProfessionalId.Value,
-            Input.Date.Value);
+            Input.ProfessionalId!.Value,
+            Input.Date!.Value);
 
         return Page();
     }
@@ -73,19 +98,20 @@ public class CreateModel : PageModel
     {
         await LoadSelectListsAsync();
 
-        SearchWasPerformed = true;
+        DatesWereLoaded = true;
+        SlotsWereLoaded = true;
 
-        if (Input.ProfessionalId is not null && Input.Date is not null)
+        await LoadAvailableDatesAsync();
+
+        if (Input.ProfessionalId.HasValue && Input.Date.HasValue)
         {
             AvailableSlots = await _availabilityService.GetAvailableSlotsAsync(
                 Input.ProfessionalId.Value,
                 Input.Date.Value);
         }
 
-        if (string.IsNullOrWhiteSpace(Input.SelectedSlotValue))
-        {
-            ModelState.AddModelError("Input.SelectedSlotValue", "Debe seleccionar un horario.");
-        }
+        ValidateProfessionalAndDate();
+        ValidateCreateData();
 
         if (!TryParseSelectedSlot(Input.SelectedSlotValue, out var startAt, out var endAt))
         {
@@ -106,14 +132,46 @@ public class CreateModel : PageModel
             return Page();
         }
 
+        var professional = await _db.Professionals
+            .Include(p => p.Specialty)
+            .FirstOrDefaultAsync(p =>
+                p.Id == Input.ProfessionalId!.Value &&
+                p.IsActive);
+
+        if (professional is null)
+        {
+            ModelState.AddModelError("Input.ProfessionalId", "El profesional seleccionado no está disponible.");
+            return Page();
+        }
+
+        var patientExists = await _db.Patients
+            .AnyAsync(p => p.Id == Input.PatientId!.Value);
+
+        if (!patientExists)
+        {
+            ModelState.AddModelError("Input.PatientId", "El paciente seleccionado no existe.");
+            return Page();
+        }
+
+        var statusExists = await _db.AppointmentStatuses
+            .AnyAsync(s => s.Id == Input.StatusId!.Value);
+
+        if (!statusExists)
+        {
+            ModelState.AddModelError("Input.StatusId", "El estado seleccionado no existe.");
+            return Page();
+        }
+
         var appointment = new Appointment
         {
-            PatientId = Input.PatientId!.Value,
-            ProfessionalId = Input.ProfessionalId!.Value,
-            StatusId = Input.StatusId,
+            PatientId = Input.PatientId.Value,
+            ProfessionalId = professional.Id,
+            SpecialtyId = professional.SpecialtyId,
+            StatusId = Input.StatusId.Value,
             StartAt = startAt,
             EndAt = endAt,
             Notes = Input.Notes,
+            PublicAccessToken = Guid.NewGuid().ToString("N"),
             CreatedAt = DateTime.UtcNow
         };
 
@@ -126,6 +184,7 @@ public class CreateModel : PageModel
     private async Task LoadSelectListsAsync()
     {
         var patients = await _db.Patients
+            .AsNoTracking()
             .OrderBy(p => p.LastName)
             .ThenBy(p => p.FirstName)
             .Select(p => new
@@ -135,19 +194,26 @@ public class CreateModel : PageModel
             })
             .ToListAsync();
 
+        PatientSelect = new SelectList(patients, "Id", "Name", Input.PatientId);
+
         var professionals = await _db.Professionals
+            .AsNoTracking()
             .Include(p => p.Specialty)
-            //.Where(p => p.IsActive)
+            .Where(p => p.IsActive)
             .OrderBy(p => p.LastName)
             .ThenBy(p => p.FirstName)
             .Select(p => new
             {
                 p.Id,
-                Name = p.LastName + ", " + p.FirstName + " - " + p.Specialty.Name
+                Name = p.LastName + ", " + p.FirstName +
+                       (p.Specialty != null ? " - " + p.Specialty.Name : "")
             })
             .ToListAsync();
 
+        ProfessionalSelect = new SelectList(professionals, "Id", "Name", Input.ProfessionalId);
+
         var statuses = await _db.AppointmentStatuses
+            .AsNoTracking()
             .OrderBy(s => s.Id)
             .Select(s => new
             {
@@ -156,9 +222,56 @@ public class CreateModel : PageModel
             })
             .ToListAsync();
 
-        PatientSelect = new SelectList(patients, "Id", "Name");
-        ProfessionalSelect = new SelectList(professionals, "Id", "Name");
-        StatusSelect = new SelectList(statuses, "Id", "Name");
+        StatusSelect = new SelectList(statuses, "Id", "Name", Input.StatusId);
+    }
+
+    private async Task LoadAvailableDatesAsync()
+    {
+        if (Input.ProfessionalId is null)
+        {
+            AvailableDates = new List<AvailableDateViewModel>();
+            return;
+        }
+
+        AvailableDates = await _availabilityService.GetAvailableDatesAsync(
+            Input.ProfessionalId.Value,
+            DateOnly.FromDateTime(DateTime.Today));
+    }
+
+    private void ValidateProfessionalAndDate()
+    {
+        if (Input.ProfessionalId is null)
+        {
+            ModelState.AddModelError("Input.ProfessionalId", "Debe seleccionar un profesional.");
+        }
+
+        if (Input.Date is null)
+        {
+            ModelState.AddModelError("Input.Date", "Debe seleccionar una fecha.");
+        }
+
+        if (Input.Date.HasValue && Input.Date.Value < DateOnly.FromDateTime(DateTime.Today))
+        {
+            ModelState.AddModelError("Input.Date", "La fecha no puede ser anterior a hoy.");
+        }
+    }
+
+    private void ValidateCreateData()
+    {
+        if (Input.PatientId is null)
+        {
+            ModelState.AddModelError("Input.PatientId", "Debe seleccionar un paciente.");
+        }
+
+        if (Input.StatusId is null)
+        {
+            ModelState.AddModelError("Input.StatusId", "Debe seleccionar un estado.");
+        }
+
+        if (string.IsNullOrWhiteSpace(Input.SelectedSlotValue))
+        {
+            ModelState.AddModelError("Input.SelectedSlotValue", "Debe seleccionar un horario.");
+        }
     }
 
     private static bool TryParseSelectedSlot(
@@ -194,5 +307,21 @@ public class CreateModel : PageModel
             out endAt);
 
         return startIsValid && endIsValid && startAt < endAt;
+    }
+
+    public class AppointmentCreateInputModel
+    {
+        public int? PatientId { get; set; }
+
+        public int? ProfessionalId { get; set; }
+
+        public DateOnly? Date { get; set; }
+
+        public string? SelectedSlotValue { get; set; }
+
+        public int? StatusId { get; set; }
+
+        [MaxLength(1000)]
+        public string? Notes { get; set; }
     }
 }

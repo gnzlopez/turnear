@@ -82,5 +82,35 @@ namespace AppointmentManager.Services.Availability
                 .OrderBy(s => s.StartAt)
                 .ToList();
         }
+
+        public async Task<List<AvailableDateViewModel>> GetAvailableDatesAsync(
+            int professionalId,
+            DateOnly fromDate,
+            int daysAhead = 30,
+            CancellationToken cancellationToken = default)
+        {
+            var availableDates = new List<AvailableDateViewModel>();
+
+            for (var i = 0; i <= daysAhead; i++)
+            {
+                var date = fromDate.AddDays(i);
+
+                var slots = await GetAvailableSlotsAsync(
+                    professionalId,
+                    date,
+                    cancellationToken);
+
+                if (slots.Any())
+                {
+                    availableDates.Add(new AvailableDateViewModel
+                    {
+                        Date = date,
+                        AvailableSlotsCount = slots.Count
+                    });
+                }
+            }
+
+            return availableDates;
+        }
     }
 }

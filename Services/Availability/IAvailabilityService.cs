@@ -8,5 +8,11 @@ namespace AppointmentManager.Services.Availability
             int professionalId,
             DateOnly date,
             CancellationToken cancellationToken = default);
+
+        Task<List<AvailableDateViewModel>> GetAvailableDatesAsync(
+            int professionalId,
+            DateOnly fromDate,
+            int daysAhead = 30,
+            CancellationToken cancellationToken = default);
     }
 }
