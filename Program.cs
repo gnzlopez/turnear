@@ -41,6 +41,13 @@ using (var scope = app.Services.CreateScope())
     await IdentitySeeder.SeedAdminAsync(userManager, app.Configuration);
 }
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.LogoutPath = "/Identity/Account/Logout";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
+
 var pathBase = app.Configuration["PathBase"];
 
 if (!string.IsNullOrWhiteSpace(pathBase))
