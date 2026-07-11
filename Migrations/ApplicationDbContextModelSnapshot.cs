@@ -84,6 +84,9 @@ namespace AppointmentManager.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<bool>("SendMail")
+                        .HasColumnType("boolean");
+
                     b.HasKey("Id");
 
                     b.ToTable("AppointmentStatuses");
@@ -96,6 +99,10 @@ namespace AppointmentManager.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Dni")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -110,6 +117,9 @@ namespace AppointmentManager.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<int>("PatientType")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Phone")
                         .HasMaxLength(50)

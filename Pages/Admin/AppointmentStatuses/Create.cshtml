@@ -32,6 +32,13 @@
 
                         <span asp-validation-for="Status.Name" class="text-danger"></span>
                     </div>
+
+                    <div class="col-md-6">
+                        <div class="form-check mt-3">
+                            <input asp-for="Status.SendMail" class="form-check-input" />
+                            <label class="form-check-label">Envia Mail</label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-end gap-2 mt-4">

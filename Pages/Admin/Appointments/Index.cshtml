@@ -98,6 +98,13 @@
                                                class="btn btn-outline-danger">
                                                 Cancelar
                                             </a>
+
+                                            <!-- Botón para abrir el modal de cambio de estado -->
+                                            <button type="button"
+                                                    class="btn btn-outline-info"
+                                                    onclick="openChangeStatusModal(@item.Id, @item.StatusId)">
+                                                Cambiar estado
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -106,6 +113,39 @@
                     </table>
                 </div>
             }
+        </div>
+    </div>
+</div>
+
+<!-- Modal para cambiar estado -->
+<div class="modal fade" id="changeStatusModal" tabindex="-1" aria-labelledby="changeStatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="ChangeStatus">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changeStatusModalLabel">Cambiar estado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+                    @* Campo oculto con el id del turno *@
+                    <input type="hidden" id="modalAppointmentId" name="appointmentId" />
+
+                    <label class="form-label">Estado</label>
+                    <select id="modalStatusId" name="statusId" class="form-select">
+                        <option value="">Seleccione...</option>
+                        @foreach (var s in Model.Statuses)
+                        {
+                            <option value="@s.Id">@s.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Aceptar</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -163,3 +203,22 @@
         };
     }
 }
+
+<script>
+    // Abre el modal y setea los campos (usa Bootstrap 5)
+    function openChangeStatusModal(appointmentId, currentStatusId) {
+        document.getElementById('modalAppointmentId').value = appointmentId;
+        var select = document.getElementById('modalStatusId');
+
+        // Si currentStatusId es 0 o vacío, deseleccionar
+        try {
+            select.value = currentStatusId || "";
+        } catch (e) {
+            select.selectedIndex = 0;
+        }
+
+        var modalEl = document.getElementById('changeStatusModal');
+        var modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+</script>

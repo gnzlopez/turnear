@@ -4,6 +4,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AppointmentManager.Models
 {
+    public enum PatientType
+    {
+        [Display(Name = "Externo")]
+        External = 0,
+
+        [Display(Name = "Interno")]
+        Internal = 1
+    }
+
     public class Patient
     {
         public int Id { get; set; }
@@ -22,6 +31,13 @@ namespace AppointmentManager.Models
 
         [NotMapped]
         public string FullName => $"{FirstName} {LastName}";
+
+        // Tipo de paciente: Externo (por defecto) o Interno
+        public PatientType PatientType { get; set; } = PatientType.External;
+
+        [Required(ErrorMessage = "Debe ingresar el DNI.")]
+        [Display(Name = "Número de Documento")]
+        public string Dni { get; set; } = string.Empty;
 
         public ICollection<Appointment>? Appointments { get; set; }
     }

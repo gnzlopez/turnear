@@ -294,6 +294,9 @@ public class IndexModel : PageModel
             Email = email
         };
 
+        // Cuando la creación viene desde el flujo público, marcar siempre como Externo
+        patient.PatientType = PatientType.External;
+
         _db.Patients.Add(patient);
 
         return patient;
@@ -361,5 +364,8 @@ public class IndexModel : PageModel
 
         [MaxLength(1000)]
         public string? Notes { get; set; }
+
+        [Required(ErrorMessage = "Debe ingresar el DNI.")]
+        public string Dni { get; set; } = string.Empty;
     }
 }

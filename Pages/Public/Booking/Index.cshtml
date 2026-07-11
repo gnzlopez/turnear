@@ -1,5 +1,6 @@
 ﻿@page "/reservar-turno"
 @model AppointmentManager.Pages.Public.Booking.IndexModel
+<!-- noop patch: placeholder to keep tooling happy -->
 
 @{
     ViewData["Title"] = "Reservar turno";
@@ -189,6 +190,12 @@
                                        placeholder="Ej: +54 9 341 0000000" />
 
                                 <span asp-validation-for="Input.Phone" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Input.Dni" class="form-label">DNI</label>
+                                <input asp-for="Input.Dni" class="form-control" placeholder="Ej: 2012345678" />
+                                <span asp-validation-for="Input.Dni" class="text-danger"></span>
                             </div>
 
                             <div class="col-md-6">

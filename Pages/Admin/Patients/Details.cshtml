@@ -65,6 +65,22 @@
                         @patient.Phone
                     }
                 </dd>
+                <dt class="col-sm-3">Documento</dt>
+                <dd class="col-sm-9">
+                    @patient.Dni
+                </dd>
+
+                <dt class="col-sm-3">Tipo</dt>
+                <dd class="col-sm-9">
+                    @if (patient.PatientType == AppointmentManager.Models.PatientType.Internal)
+                    {
+                        <span class="badge" style="background-color:#fff59d;color:#000;padding:.45rem .6rem;border-radius:.375rem;">Interno</span>
+                    }
+                    else
+                    {
+                        <span class="badge" style="background-color:#ffcccc;color:#000;padding:.45rem .6rem;border-radius:.375rem;">Externo</span>
+                    }
+                </dd>
             </dl>
         </div>
     </div>

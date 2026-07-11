@@ -68,6 +68,21 @@
 
                         <span asp-validation-for="Patient.Phone" class="text-danger"></span>
                     </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Patient.PatientType" class="form-label">Tipo de paciente</label>
+                        <select asp-for="Patient.PatientType" class="form-select">
+                            <option value="0">Externo</option>
+                            <option value="1">Interno</option>
+                        </select>
+                        <span asp-validation-for="Patient.PatientType" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Patient.Dni" class="form-label">DNI</label>
+                        <input asp-for="Patient.Dni" class="form-control" placeholder="Ej: 2012345678" />
+                        <span asp-validation-for="Patient.Dni" class="text-danger"></span>
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-end gap-2 mt-4">

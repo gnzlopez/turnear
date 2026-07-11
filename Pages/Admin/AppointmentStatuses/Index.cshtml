@@ -36,6 +36,7 @@
                         <thead>
                             <tr>
                                 <th>Nombre</th>
+                                <th>Envia Mail</th>
                                 <th class="text-end">Acciones</th>
                             </tr>
                         </thead>
@@ -47,6 +48,10 @@
                                         <span class="fw-semibold">
                                             @item.Name
                                         </span>
+                                    </td>
+
+                                    <td>
+                                        @(item.SendMail ? "Si" : "No")
                                     </td>
 
                                     <td class="text-end">

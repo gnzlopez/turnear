@@ -23,10 +23,86 @@
 
     <div class="card">
         <div class="card-body">
-            @if (!Model.Patients.Any())
+            <form method="get" class="mb-3">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Nombre / Apellido</label>
+                        <input name="q" value="@(Request.Query["q"].ToString())" class="form-control" placeholder="Buscar por nombre o apellido" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Email</label>
+                        <input name="email" value="@(Request.Query["email"].ToString())" class="form-control" placeholder="Email" />
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Tipo</label>
+                        <select name="type" class="form-select">
+                            <option value="">Todos</option>
+                            @if (Request.Query["type"] == "0")
+                            {
+                                <option value="0" selected>Externo</option>
+                            }
+                            else
+                            {
+                                <option value="0">Externo</option>
+                            }
+
+                            @if (Request.Query["type"] == "1")
+                            {
+                                <option value="1" selected>Interno</option>
+                            }
+                            else
+                            {
+                                <option value="1">Interno</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">DNI</label>
+                        <input name="dni" value="@(Request.Query["dni"].ToString())" class="form-control" placeholder="DNI" />
+                    </div>
+
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">Filtrar</button>
+                    </div>
+                </div>
+            </form>
+
+            @{
+                var patients = Model.Patients.AsQueryable();
+                var q = (string?)Request.Query["q"];
+                var email = (string?)Request.Query["email"];
+                var type = (string?)Request.Query["type"];
+                var dni = (string?)Request.Query["dni"];
+
+                if (!string.IsNullOrWhiteSpace(q))
+                {
+                    patients = patients.Where(p => (p.FirstName + " " + p.LastName).Contains(q) || (p.LastName + " " + p.FirstName).Contains(q));
+                }
+
+                if (!string.IsNullOrWhiteSpace(email))
+                {
+                    patients = patients.Where(p => p.Email != null && p.Email.Contains(email));
+                }
+
+                if (!string.IsNullOrWhiteSpace(type) && (type == "0" || type == "1"))
+                {
+                    var t = int.Parse(type);
+                    patients = patients.Where(p => (int)p.PatientType == t);
+                }
+
+                if (!string.IsNullOrWhiteSpace(dni))
+                {
+                    patients = patients.Where(p => p.Dni != null && p.Dni.Contains(dni));
+                }
+            }
+
+            @if (!patients.Any())
             {
                 <div class="alert alert-info mb-0">
-                    Todavía no hay pacientes cargados.
+                    No se encontraron pacientes.
                 </div>
             }
             else
@@ -36,19 +112,34 @@
                         <thead>
                             <tr>
                                 <th>Paciente</th>
+                                <th>DNI</th>
+                                <th>Tipo</th>
                                 <th>Email</th>
                                 <th>Teléfono</th>
                                 <th class="text-end">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.Patients)
+                            @foreach (var item in patients)
                             {
                                 <tr>
                                     <td>
                                         <span class="fw-semibold">
                                             @item.LastName, @item.FirstName
                                         </span>
+                                    </td>
+
+                                    <td>@item.Dni</td>
+
+                                    <td>
+                                        @if (item.PatientType == AppointmentManager.Models.PatientType.Internal)
+                                        {
+                                            <span class="badge" style="background-color:#fff59d;color:#000;padding:.35rem .5rem;border-radius:.375rem;">Interno</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge" style="background-color:#ffcccc;color:#000;padding:.35rem .5rem;border-radius:.375rem;">Externo</span>
+                                        }
                                     </td>
 
                                     <td>
