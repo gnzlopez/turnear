@@ -14,10 +14,15 @@
             </p>
         </div>
 
-        <div class="col-auto">
+        <div class="col-auto d-flex gap-2">
             <a asp-page="./Create" class="btn btn-primary">
                 Crear estado
             </a>
+
+            <!-- Botón para abrir modal de plantillas -->
+            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#templateModal">
+                Plantilla de Mail
+            </button>
         </div>
     </div>
 
@@ -45,9 +50,7 @@
                             {
                                 <tr>
                                     <td>
-                                        <span class="fw-semibold">
-                                            @item.Name
-                                        </span>
+                                        <span class="fw-semibold">@item.Name</span>
                                     </td>
 
                                     <td>
@@ -56,23 +59,9 @@
 
                                     <td class="text-end">
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <a asp-page="./Details"
-                                               asp-route-id="@item.Id"
-                                               class="btn btn-outline-secondary">
-                                                Ver
-                                            </a>
-
-                                            <a asp-page="./Edit"
-                                               asp-route-id="@item.Id"
-                                               class="btn btn-outline-primary">
-                                                Editar
-                                            </a>
-
-                                            <a asp-page="./Delete"
-                                               asp-route-id="@item.Id"
-                                               class="btn btn-outline-danger">
-                                                Eliminar
-                                            </a>
+                                            <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-outline-secondary">Ver</a>
+                                            <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">Editar</a>
+                                            <a asp-page="./Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">Eliminar</a>
                                         </div>
                                     </td>
                                 </tr>

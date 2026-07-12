@@ -5,6 +5,7 @@
 
 <form method="post">
     <input type="hidden" asp-for="Status.Id" />
+
     <div class="mb-3">
         <label asp-for="Status.Name" class="form-label"></label>
         <input asp-for="Status.Name" class="form-control" />
@@ -13,11 +14,46 @@
 
     <div class="mb-3 form-check">
         <input asp-for="Status.SendMail" class="form-check-input" />
-        <label class="form-check-label">Envia Mail</label>
+        <label asp-for="Status.SendMail" class="form-check-label">Envia Mail</label>
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-page="Index" class="btn btn-secondary">Back to list</a>
+    <div class="d-flex gap-2">
+        <!-- Botón para abrir modal que editará la plantilla del estado ya cargado -->
+        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#templateModal">
+            Plantilla de Mail
+        </button>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-page="Index" class="btn btn-secondary">Back to list</a>
+    </div>
+
+    <!-- Modal (dentro del form para que el textarea sea parte del post) -->
+    <div class="modal fade" id="templateModal" tabindex="-1" aria-labelledby="templateModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="templateModalLabel">Plantilla de mail</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Plantilla (puede usar {FirstName}, {LastName}, {StartAt}, {Status})</label>
+                        <textarea asp-for="Status.EmailTemplate" class="form-control" rows="10"></textarea>
+                        <span asp-validation-for="Status.EmailTemplate" class="text-danger"></span>
+                    </div>
+
+                    <div class="text-muted small">
+                        Ejemplo: &lt;p&gt;Hola {FirstName}, su turno para {StartAt} cambió a &lt;strong&gt;{Status}&lt;/strong&gt;.&lt;/p&gt;
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </form>
 
 @section Scripts {

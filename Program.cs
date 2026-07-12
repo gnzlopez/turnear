@@ -3,8 +3,18 @@ using AppointmentManager.Services.Availability;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Serilog from configuration early
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+// Use Serilog as the logging provider
+builder.Host.UseSerilog();
 
 // Connection string
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
@@ -42,6 +52,11 @@ builder.Services.AddRazorPages(options =>
 // Services
 builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
 
+// Email services
+builder.Services.AddTransient<AppointmentManager.Services.Email.IEmailSender, AppointmentManager.Services.Email.SmtpEmailSender>();
+builder.Services.AddSingleton<AppointmentManager.Services.Email.IEmailQueue, AppointmentManager.Services.Email.BackgroundEmailQueue>();
+builder.Services.AddHostedService<AppointmentManager.Services.Email.EmailQueueHostedService>();
+
 // Forwarded headers para Nginx reverse proxy
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -52,55 +67,68 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 var app = builder.Build();
 
-// Necesario cuando la app está detrás de Nginx
-app.UseForwardedHeaders();
-
-// Seed
-using (var scope = app.Services.CreateScope())
+try
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    Log.Information("Starting web host");
 
-    if (app.Environment.IsDevelopment())
+    // Necesario cuando la app está detrás de Nginx
+    app.UseForwardedHeaders();
+
+    // Seed
+    using (var scope = app.Services.CreateScope())
     {
-        await DbSeeder.SeedAsync(db);
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        if (app.Environment.IsDevelopment())
+        {
+            await DbSeeder.SeedAsync(db);
+        }
+
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+        await IdentitySeeder.SeedRolesAsync(roleManager);
+        await IdentitySeeder.SeedAdminAsync(userManager, app.Configuration);
     }
 
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    // PathBase para publicar bajo /turnear
+    var pathBase = app.Configuration["PathBase"];
 
-    await IdentitySeeder.SeedRolesAsync(roleManager);
-    await IdentitySeeder.SeedAdminAsync(userManager, app.Configuration);
+    if (!string.IsNullOrWhiteSpace(pathBase))
+    {
+        app.UsePathBase(pathBase);
+    }
+
+    // Pipeline
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseMigrationsEndPoint();
+    }
+    else
+    {
+        app.UseExceptionHandler("/Error");
+        app.UseHsts();
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseRouting();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapStaticAssets();
+
+    app.MapRazorPages()
+       .WithStaticAssets();
+
+    app.Run();
 }
-
-// PathBase para publicar bajo /turnear
-var pathBase = app.Configuration["PathBase"];
-
-if (!string.IsNullOrWhiteSpace(pathBase))
+catch (Exception ex)
 {
-    app.UsePathBase(pathBase);
+    Log.Fatal(ex, "Host terminated unexpectedly");
 }
-
-// Pipeline
-if (app.Environment.IsDevelopment())
+finally
 {
-    app.UseMigrationsEndPoint();
+    Log.CloseAndFlush();
 }
-else
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-
-app.UseRouting();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapStaticAssets();
-
-app.MapRazorPages()
-   .WithStaticAssets();
-
-app.Run();

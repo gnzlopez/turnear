@@ -79,6 +79,10 @@ namespace AppointmentManager.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("EmailTemplate")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)

@@ -36,20 +36,55 @@
                     <div class="col-md-6">
                         <div class="form-check mt-3">
                             <input asp-for="Status.SendMail" class="form-check-input" />
-                            <label class="form-check-label">Envia Mail</label>
+                            <label asp-for="Status.SendMail" class="form-check-label">Envia Mail</label>
                         </div>
                     </div>
                 </div>
 
+                <!-- Modal trigger & form actions -->
                 <div class="d-flex justify-content-end gap-2 mt-4">
                     <a asp-page="./Index" class="btn btn-outline-secondary">
                         Cancelar
                     </a>
 
+                    <!-- Abre modal para editar la plantilla del mail asociada al estado que estamos creando -->
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#templateModal">
+                        Plantilla de Mail
+                    </button>
+
                     <button type="submit" class="btn btn-primary">
                         Guardar
                     </button>
                 </div>
+
+                <!-- Modal: editar plantilla (dentro del mismo form para que el textarea se posteé junto con Status) -->
+                <div class="modal fade" id="templateModal" tabindex="-1" aria-labelledby="templateModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="templateModalLabel">Plantilla de mail</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Plantilla (puede usar {FirstName}, {LastName}, {StartAt}, {Status})</label>
+                                    <textarea asp-for="Status.EmailTemplate" class="form-control" rows="10"></textarea>
+                                    <span asp-validation-for="Status.EmailTemplate" class="text-danger"></span>
+                                </div>
+
+                                <div class="text-muted small">
+                                    Ejemplo: &lt;p&gt;Hola {FirstName}, su turno para {StartAt} cambió a &lt;strong&gt;{Status}&lt;/strong&gt;.&lt;/p&gt;
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </form>
         </div>
     </div>
