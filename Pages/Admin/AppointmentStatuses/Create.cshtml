@@ -33,24 +33,24 @@
                         <span asp-validation-for="Status.Name" class="text-danger"></span>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="form-check mt-3">
+                    <div class="form-check mt-3">
                             <input asp-for="Status.SendMail" class="form-check-input" />
                             <label asp-for="Status.SendMail" class="form-check-label">Envia Mail</label>
-                        </div>
                     </div>
                 </div>
 
-                <!-- Modal trigger & form actions -->
+                <!-- Modal -->
+                <div class="d-flex justify-content-start gap-2 mt-4">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#templateModal">
+                        Plantilla de Mail
+                    </button>
+                </div>
+
+                <!-- Acciones -->
                 <div class="d-flex justify-content-end gap-2 mt-4">
                     <a asp-page="./Index" class="btn btn-outline-secondary">
                         Cancelar
                     </a>
-
-                    <!-- Abre modal para editar la plantilla del mail asociada al estado que estamos creando -->
-                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#templateModal">
-                        Plantilla de Mail
-                    </button>
 
                     <button type="submit" class="btn btn-primary">
                         Guardar
@@ -68,13 +68,20 @@
 
                             <div class="modal-body">
                                 <div class="mb-3">
-                                    <label class="form-label">Plantilla (puede usar {FirstName}, {LastName}, {StartAt}, {Status})</label>
+                                    <label class="form-label">
+                                        Puede usar:<br>
+                                        {Nombre} para nombre del paciente.<br>
+                                        {Apellido} para apellido del paciente.<br>
+                                        {Dia} para el dia del turno.<br>
+                                        {Hora} para la hora del turno.<br>
+                                        {Profesional} para el nombre del profesional.<br>
+                                        {Estado} para el estado del turno. </label>
                                     <textarea asp-for="Status.EmailTemplate" class="form-control" rows="10"></textarea>
                                     <span asp-validation-for="Status.EmailTemplate" class="text-danger"></span>
                                 </div>
 
                                 <div class="text-muted small">
-                                    Ejemplo: &lt;p&gt;Hola {FirstName}, su turno para {StartAt} cambió a &lt;strong&gt;{Status}&lt;/strong&gt;.&lt;/p&gt;
+                                    Ejemplo: Hola {Nombre}, su turno para {Dia} cambió a {Estado}
                                 </div>
                             </div>
 
