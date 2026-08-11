@@ -68,6 +68,8 @@ namespace AppointmentManager.Pages.Admin.Appointments
             }
 
             var appointment = await _db.Appointments
+                .Include(p => p.Patient)
+                .Include(p => p.Professional)
                 .FirstOrDefaultAsync(a => a.Id == Input.Id);
 
             if (appointment is null)

@@ -147,10 +147,10 @@ public class CreateModel : PageModel
             return Page();
         }
 
-        var patientExists = await _db.Patients
-            .AnyAsync(p => p.Id == Input.PatientId!.Value);
+        var patient = await _db.Patients
+            .FirstOrDefaultAsync(p => p.Id == Input.PatientId!.Value);
 
-        if (!patientExists)
+        if (patient is null)
         {
             ModelState.AddModelError("Input.PatientId", "El paciente seleccionado no existe.");
             return Page();
@@ -181,7 +181,7 @@ public class CreateModel : PageModel
         _db.Appointments.Add(appointment);
         await _db.SaveChangesAsync();
 
-        if (status.SendMail && !string.IsNullOrWhiteSpace(appointment.Patient?.Email))
+        if (status.SendMail && !string.IsNullOrWhiteSpace(patient?.Email))
         {
             var to = appointment.Patient!.Email!;
             var subject = $"Cambio de estado de su turno - {status.Name}";
@@ -189,11 +189,11 @@ public class CreateModel : PageModel
             // Si EmailTemplate está definido, usarlo (reemplazos simples)
             var template = status.EmailTemplate ?? "<p>Su turno cambió de estado a {Status}.</p>";
             var body = template
-                .Replace("{Nombre}", appointment.Patient!.FirstName)
-                .Replace("{Apellido}", appointment.Patient!.LastName)
+                .Replace("{Nombre}", patient!.FirstName)
+                .Replace("{Apellido}", patient!.LastName)
                 .Replace("{Dia}", appointment.StartAt.ToString("dd/MM/yyyy"))
                 .Replace("{Hora}", appointment.StartAt.ToString("HH:mm"))
-                .Replace("{Profesional}", appointment.Professional!.FullName)
+                .Replace("{Profesional}", professional!.FullName)
                 .Replace("{Estado}", status.Name);
 
             var msg = new EmailMessage { To = to, Subject = subject, Body = body };
