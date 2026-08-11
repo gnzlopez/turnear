@@ -133,7 +133,6 @@
 
                     <label class="form-label">Estado</label>
                     <select id="modalStatusId" name="statusId" class="form-select">
-                        <option value="">Seleccione...</option>
                         @foreach (var s in Model.Statuses)
                         {
                             <option value="@s.Id">@s.Name</option>
