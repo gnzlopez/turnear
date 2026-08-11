@@ -10,9 +10,9 @@ public class DeleteModel : PageModel
 {
     private readonly ApplicationDbContext _db;
 
-    public DeleteModel(ApplicationDbContext context)
+    public DeleteModel(ApplicationDbContext db)
     {
-        _db = context;
+        _db = db;
     }
 
     [BindProperty]

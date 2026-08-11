@@ -11,9 +11,9 @@ public class EditModel : PageModel
 {
     private readonly ApplicationDbContext _db;
 
-    public EditModel(ApplicationDbContext context)
+    public EditModel(ApplicationDbContext db)
     {
-        _db = context;
+        _db = db;
     }
 
     public SelectList? ProfessionalSelect { get; set; }

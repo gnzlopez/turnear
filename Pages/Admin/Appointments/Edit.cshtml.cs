@@ -1,5 +1,7 @@
 using AppointmentManager.Data;
 using AppointmentManager.Models;
+using AppointmentManager.Services.Availability;
+using AppointmentManager.Services.Email;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,8 +16,13 @@ namespace AppointmentManager.Pages.Admin.Appointments
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _db;
+        private readonly IEmailQueue _emailQueue;
 
-        public EditModel(ApplicationDbContext db) => _db = db;
+        public EditModel(ApplicationDbContext db, IEmailQueue emailQueue)
+        {
+            _db = db;
+            _emailQueue = emailQueue;
+        }
 
         [BindProperty]
         public AppointmentEditInputModel Input { get; set; } = new();
@@ -68,10 +75,38 @@ namespace AppointmentManager.Pages.Admin.Appointments
                 return NotFound();
             }
 
+            var status = await _db.AppointmentStatuses
+                .FirstOrDefaultAsync(s => s.Id == Input.StatusId);
+
+            if (status is null)
+            {
+                ModelState.AddModelError("Input.StatusId", "El estado seleccionado no existe.");
+                return Page();
+            }
+
             appointment.StatusId = Input.StatusId;
             appointment.Notes = Input.Notes;
 
             await _db.SaveChangesAsync();
+
+            if (status.SendMail && !string.IsNullOrWhiteSpace(appointment.Patient?.Email))
+            {
+                var to = appointment.Patient!.Email!;
+                var subject = $"Cambio de estado de su turno - {status.Name}";
+
+                // Si EmailTemplate está definido, usarlo (reemplazos simples)
+                var template = status.EmailTemplate ?? "<p>Su turno cambió de estado a {Status}.</p>";
+                var body = template
+                    .Replace("{Nombre}", appointment.Patient!.FirstName)
+                    .Replace("{Apellido}", appointment.Patient!.LastName)
+                    .Replace("{Dia}", appointment.StartAt.ToString("dd/MM/yyyy"))
+                    .Replace("{Hora}", appointment.StartAt.ToString("HH:mm"))
+                    .Replace("{Profesional}", appointment.Professional!.FullName)
+                    .Replace("{Estado}", status.Name);
+
+                var msg = new EmailMessage { To = to, Subject = subject, Body = body };
+                _emailQueue.Enqueue(msg);
+            }
 
             return RedirectToPage("./Index");
         }

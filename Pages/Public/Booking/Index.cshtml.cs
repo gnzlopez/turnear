@@ -16,9 +16,9 @@ public class IndexModel : PageModel
     private readonly ApplicationDbContext _db;
     private readonly IAvailabilityService _availabilityService;
 
-    public IndexModel(ApplicationDbContext context, IAvailabilityService availabilityService)
+    public IndexModel(ApplicationDbContext db, IAvailabilityService availabilityService)
     {
-        _db = context;
+        _db = db;
         _availabilityService = availabilityService;
     }
 
@@ -64,10 +64,10 @@ public class IndexModel : PageModel
             ModelState.AddModelError("Input.ProfessionalId", "Debe seleccionar un profesional.");
         }
 
-        if (!ModelState.IsValid)
-        {
-            return Page();
-        }
+        //if (!ModelState.IsValid)
+        //{
+        //    return Page();
+        //}
 
         DatesWereLoaded = true;
 
@@ -91,10 +91,10 @@ public class IndexModel : PageModel
 
         ValidateSearchData();
 
-        if (!ModelState.IsValid)
-        {
-            return Page();
-        }
+        //if (!ModelState.IsValid)
+        //{
+        //    return Page();
+        //}
 
         AvailableSlots = await _availabilityService.GetAvailableSlotsAsync(
             Input.ProfessionalId!.Value,
@@ -162,7 +162,7 @@ public class IndexModel : PageModel
 
         if (pendingStatusId is null)
         {
-            ModelState.AddModelError(string.Empty, "No existe un estado pendiente configurado para crear el turno.");
+            ModelState.AddModelError(string.Empty, "No existe un estado configurado para crear el turno. Por favor, pongase en contacto con la administración.");
             return Page();
         }
 
@@ -262,6 +262,7 @@ public class IndexModel : PageModel
         var firstName = Input.PatientFirstName.Trim();
         var lastName = Input.PatientLastName.Trim();
         var phone = Input.Phone.Trim();
+        var DNI = Input.Dni.Trim();
 
         var email = string.IsNullOrWhiteSpace(Input.Email)
             ? null
@@ -269,8 +270,7 @@ public class IndexModel : PageModel
 
         var patient = await _db.Patients
             .FirstOrDefaultAsync(p =>
-                p.Phone == phone ||
-                (email != null && p.Email == email));
+                p.Dni == DNI);
 
         if (patient is not null)
         {
@@ -291,7 +291,8 @@ public class IndexModel : PageModel
             FirstName = firstName,
             LastName = lastName,
             Phone = phone,
-            Email = email
+            Email = email,
+            Dni = DNI
         };
 
         // Cuando la creación viene desde el flujo público, marcar siempre como Externo

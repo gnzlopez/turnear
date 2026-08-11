@@ -1,13 +1,14 @@
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 using AppointmentManager.Data;
 using AppointmentManager.Models;
 using AppointmentManager.Services.Availability;
+using AppointmentManager.Services.Email;
 using AppointmentManager.ViewModels.Admin;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace AppointmentManager.Pages.Admin.Appointments;
 
@@ -15,11 +16,13 @@ public class CreateModel : PageModel
 {
     private readonly ApplicationDbContext _db;
     private readonly IAvailabilityService _availabilityService;
+    private readonly IEmailQueue _emailQueue;
 
-    public CreateModel(ApplicationDbContext context, IAvailabilityService availabilityService)
+    public CreateModel(ApplicationDbContext db, IAvailabilityService availabilityService, IEmailQueue emailQueue)
     {
-        _db = context;
+        _db = db;
         _availabilityService = availabilityService;
+        _emailQueue = emailQueue;
     }
 
     [BindProperty]
@@ -153,10 +156,10 @@ public class CreateModel : PageModel
             return Page();
         }
 
-        var statusExists = await _db.AppointmentStatuses
-            .AnyAsync(s => s.Id == Input.StatusId!.Value);
+        var status = await _db.AppointmentStatuses
+            .FirstOrDefaultAsync(s => s.Id == Input.StatusId!.Value);
 
-        if (!statusExists)
+        if (status is null)
         {
             ModelState.AddModelError("Input.StatusId", "El estado seleccionado no existe.");
             return Page();
@@ -177,6 +180,25 @@ public class CreateModel : PageModel
 
         _db.Appointments.Add(appointment);
         await _db.SaveChangesAsync();
+
+        if (status.SendMail && !string.IsNullOrWhiteSpace(appointment.Patient?.Email))
+        {
+            var to = appointment.Patient!.Email!;
+            var subject = $"Cambio de estado de su turno - {status.Name}";
+
+            // Si EmailTemplate está definido, usarlo (reemplazos simples)
+            var template = status.EmailTemplate ?? "<p>Su turno cambió de estado a {Status}.</p>";
+            var body = template
+                .Replace("{Nombre}", appointment.Patient!.FirstName)
+                .Replace("{Apellido}", appointment.Patient!.LastName)
+                .Replace("{Dia}", appointment.StartAt.ToString("dd/MM/yyyy"))
+                .Replace("{Hora}", appointment.StartAt.ToString("HH:mm"))
+                .Replace("{Profesional}", appointment.Professional!.FullName)
+                .Replace("{Estado}", status.Name);
+
+            var msg = new EmailMessage { To = to, Subject = subject, Body = body };
+            _emailQueue.Enqueue(msg);
+        }
 
         return RedirectToPage("./Index");
     }

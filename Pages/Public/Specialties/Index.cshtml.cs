@@ -8,9 +8,9 @@ public class IndexModel : PageModel
 {
     private readonly ApplicationDbContext _db;
 
-    public IndexModel(ApplicationDbContext context)
+    public IndexModel(ApplicationDbContext db)
     {
-        _db = context;
+        _db = db;
     }
 
     public IList<SpecialtyListItem> Specialties { get; set; } = new List<SpecialtyListItem>();

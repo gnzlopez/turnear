@@ -9,9 +9,9 @@ namespace AppointmentManager.Pages.Admin.Availabilities;
 public class DetailsModel : PageModel
 {
     private readonly ApplicationDbContext _db;
-    public DetailsModel(ApplicationDbContext context)
+    public DetailsModel(ApplicationDbContext db)
     {
-        _db = context;
+        _db = db;
     }
 
     public ProfessionalAvailability ProfessionalAvailability { get; set; } = default!;
